@@ -1,3 +1,4 @@
 data/
 data/yolo_data/
-.DS_Store/
+.DS_Store
+.gitignore
