@@ -9,5 +9,12 @@ Promise.all(data.map(file => d3.csv(`data/${file}.csv`, (row,i) => {
     return row;
 })))
     .then(data_list => {
-        console.log(data_list)
+        let ycards = [];
+        for(let i = 0; i < data.length; i++){
+            let ycard = new MultnomahCard(data_list[i], ids[i],  data[i], texts[i])
+            ycard.buildVis()
+            //ycard.drawVisMetadata()
+            //ycard.drawVis()
+            ycards.push(ycard)
+        }
     })
