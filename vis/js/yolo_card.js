@@ -1,10 +1,11 @@
 
 class YoloCard{
-    constructor(data, id, card_title='No card title provided', card_text='No card subtitle provided'){
+    constructor(data, id, card_title='No card title provided', card_text='No card subtitle provided', keys=[]){
         this.data = data;
         this.id = id;
         this.title = card_title;
         this.text = card_text;
+        this.keys = keys;
         this.fullMonths = {
             'Jan': 'January', 
             'Feb': 'February', 
@@ -94,7 +95,7 @@ class YoloCard{
                     .style('font-size','14pt')
     }
 
-    drawVis(){
+    drawLineChart(){
         let vis = this;
         vis.relevantData = vis.data.filter(d => +d.Date.replace("'",'').split(' ')[1] > 20)
 
@@ -103,7 +104,7 @@ class YoloCard{
             .range([0,vis.visWidth])
         
         vis.y_axis = d3.scaleLinear()
-            .domain(d3.extent(vis.data.map(d => vis.title.includes('Diverted') ? d['Cases Diverted '] : d['Cases Sentenced '])))
+            .domain([0,d3.max(vis.data.map(d => d[vis.keys]))])
             .range([vis.height,0])
 
         vis.gridlines = vis.svg.append('g')
@@ -112,6 +113,7 @@ class YoloCard{
             .enter()
             
         vis.gridlines.append('line')
+                .attr('transform',`translate(0,${vis.margin.top})`)
                 .attr('x1', vis.margin.left + vis.totalWidth*0.3)
                 .attr('y1', d => {
                     return vis.y_axis(d)
@@ -122,6 +124,7 @@ class YoloCard{
                 .attr('stroke-width', 1)
         
         vis.gridlines.append('text')
+                .attr('transform',`translate(0,${vis.margin.top})`)
                 .attr('x', vis.margin.left + vis.totalWidth*0.28)
                 .attr('y', d => {
                     return vis.y_axis(d)
@@ -130,46 +133,47 @@ class YoloCard{
                 .attr('text-anchor', 'middle')
                 .attr('font-weight', 300)
                 .attr('font-size', '11pt')
-        
+
         vis.svg.append('g')
-            .attr('transform',`translate(${vis.margin.left+vis.labelsWidth},${vis.margin.top})`)
-            .append('path')
-            .datum(vis.relevantData)
-            .attr('fill','none')
-            .attr('stroke', 'steelblue')
-            .attr('stroke-width', 3)
-            .attr('d', d3.line()
-                .x(d => {
-                    let [mo,yr] = d.Date.split(' ')
-                    mo = 'JanFebMarAprMayJunJulAugSepOctNovDec'.indexOf(mo) / 3;
-                    yr = +yr.replace("'",'20')
-                    //console.log(vis.x_axis(new Date(yr,mo)))
-                    return vis.x_axis(new Date(yr,mo))
-                })
-                .y(d => {
-                    return vis.y_axis(+(vis.title.includes('Diverted') ? d['Cases Diverted '] : d['Cases Sentenced ']))
-                })
-            )
+                .attr('transform',`translate(${vis.margin.left+vis.labelsWidth},${vis.margin.top})`)
+                .append('path')
+                .datum(vis.relevantData)
+                .attr('fill','none')
+                .attr('stroke', 'steelblue')
+                .attr('stroke-width', 4)
+                .attr('d', d3.line()
+                    .x(d => {
+                        let [mo,yr] = d.Date.split(' ')
+                        mo = 'JanFebMarAprMayJunJulAugSepOctNovDec'.indexOf(mo) / 3;
+                        yr = +yr.replace("'",'20')
+                        //console.log(vis.x_axis(new Date(yr,mo)))
+                        return vis.x_axis(new Date(yr,mo))
+                    })
+                    .y(d => {
+                        return vis.y_axis(+d[vis.keys])
+                    })
+                )
+            
+            vis.svg.append('g')
+                .attr('transform',`translate(${vis.margin.left+vis.labelsWidth},${vis.margin.top})`)
+                .selectAll('circle')
+                .data(vis.relevantData)
+                .enter()
+                .append('circle')
+                    .attr('cx', d => {
+                        let [mo,yr] = d.Date.split(' ')
+                        mo = 'JanFebMarAprMayJunJulAugSepOctNovDec'.indexOf(mo) / 3;
+                        yr = +yr.replace("'",'20') 
+                        return vis.x_axis(new Date(yr,mo))
+                    })
+                    .attr('cy', d => {
+                        return vis.y_axis(+d[vis.keys])
+                    })
+                    .attr('r', 4)
+                    .attr('fill','white')
+                    .attr('stroke','steelblue')
+                    .attr('stroke-width',1)
         
-        vis.svg.append('g')
-            .attr('transform',`translate(${vis.margin.left+vis.labelsWidth},${vis.margin.top})`)
-            .selectAll('circle')
-            .data(vis.relevantData)
-            .enter()
-            .append('circle')
-                .attr('cx', d => {
-                    let [mo,yr] = d.Date.split(' ')
-                    mo = 'JanFebMarAprMayJunJulAugSepOctNovDec'.indexOf(mo) / 3;
-                    yr = +yr.replace("'",'20') 
-                    return vis.x_axis(new Date(yr,mo))
-                })
-                .attr('cy', d => {
-                    return vis.y_axis(+(vis.title.includes('Diverted') ? d['Cases Diverted '] : d['Cases Sentenced ']))
-                })
-                .attr('r', 4)
-                .attr('fill','white')
-                .attr('stroke','steelblue')
-                .attr('stroke-width',1)
         
         vis.overlays = vis.svg.selectAll('overlay')
             .data(vis.relevantData)
@@ -188,7 +192,7 @@ class YoloCard{
             d3.select(`#${vis.id}_infod_${d.index}`).style('visibility', 'visible')
             d3.select(`#${vis.id}_infoc_${d.index}`).style('visibility', 'visible')
 
-            let innerText = d[vis.title.includes('Diverted') ? 'Cases Diverted ' : 'Cases Sentenced ']
+            let innerText = d[vis.keys]
             let selectedMonth = `${vis.fullMonths[d.Date.split(' ')[0]]} ${d.Date.split(' ')[1].replace("'", '20')}`
 
             d3.select(`#${vis.id}_total`).text(innerText)
@@ -249,7 +253,7 @@ class YoloCard{
                     return vis.x_axis(new Date(yr,mo))-10
                 })
                 .attr('y', 0)
-                .text(d => vis.title.includes('Diverted') ? d['Cases Diverted '] : d['Cases Sentenced '])
+                .text(d => d[vis.keys])
                 .style('font-weight', 200)
                 .style('font-size', '10pt')
         
@@ -279,11 +283,168 @@ class YoloCard{
                     return vis.x_axis(new Date(yr,mo))
                 })
                 .attr('cy', d => {
-                    return vis.y_axis(+(vis.title.includes('Diverted') ? d['Cases Diverted '] : d['Cases Sentenced ']))
+                    return vis.y_axis(+(d[vis.keys]))
                 })
                 .attr('r', d => d.index === 24 ? 8 : 6)
                 .attr('fill','lightblue')
                 .attr('stroke','steelblue')
                 .attr('stroke-width',2)
+    }
+
+    drawBarChart(){
+        let vis = this;
+        vis.relevantData = vis.data.filter(d => +d.Date.replace("'",'').split(' ')[1] > 20)
+
+        vis.x_axis = d3.scaleBand()
+            .domain(vis.relevantData.map(d => d.Date))
+            .range([0,vis.visWidth])
+
+        vis.y_axis = d3.scaleLinear()
+            .domain([0,d3.max(vis.data.map(d => d[vis.keys]))])
+            .range([vis.height,0])
+        
+        vis.gridlines = vis.svg.append('g')
+            .selectAll('line')
+            .data([0, 100])
+            .enter()
+            
+        vis.gridlines.append('line')
+                .attr('transform',`translate(0,${vis.margin.top})`)
+                .attr('x1', vis.margin.left + vis.totalWidth*0.3)
+                .attr('y1', d => {
+                    return vis.y_axis(d)
+                })
+                .attr('x2', vis.totalWidth-vis.margin.right)
+                .attr('y2', d => vis.y_axis(d))
+                .attr('stroke', 'lightgrey')
+                .attr('stroke-width', 1)
+        
+        vis.gridlines.append('text')
+                .attr('transform',`translate(0,${vis.margin.top})`)
+                .attr('x', vis.margin.left + vis.totalWidth*0.28)
+                .attr('y', d => {
+                    return vis.y_axis(d)
+                })
+                .text(d => d)
+                .attr('text-anchor', 'middle')
+                .attr('font-weight', 300)
+                .attr('font-size', '11pt')  
+                
+        
+        vis.svg.selectAll("bars")
+            .data(vis.relevantData)
+            .join("rect")
+                .attr('id', d => `${vis.id}_bar_${d.index}`)
+                .attr('transform',`translate(${vis.margin.left+vis.labelsWidth},${vis.margin.top})`)
+                .attr("x", d => vis.x_axis(d.Date))
+                .attr("y", d => {
+                    return vis.y_axis(d[vis.keys])
+                })
+                .attr("width", vis.x_axis.bandwidth()*0.8)
+                .attr("height", d => {
+                    return vis.height - vis.y_axis(d[vis.keys]) 
+                })
+                .attr("fill", d => d.index === 24 ? 'steelblue' : "white")
+                .attr('stroke', 'steelblue')
+                .on('mouseover', function(e,d){
+                    d3.select(`#${vis.id}_infod_24`)
+                        .style('visibility', 'hidden')
+                    d3.select(`#${vis.id}_infov_24`)
+                        .style('visibility', 'hidden')
+                    d3.select(`#${vis.id}_label_24`)
+                        .style('visibility', 'hidden')
+                    
+                    d3.select(`#${vis.id}_bar_24`)
+                        .attr('fill', 'white')
+
+                    let innerText = d[vis.keys]
+                    let selectedMonth = `${vis.fullMonths[d.Date.split(' ')[0]]} ${d.Date.split(' ')[1].replace("'", '20')}`
+
+                    d3.select(`#${vis.id}_total`).text(innerText)
+                    d3.select(`#${vis.id}_month`).text(selectedMonth)
+                    d3.select(this).attr("fill", "steelblue")
+
+                    vis.numberWidth = BrowserText.getWidth(innerText,35,'Helvetica Neue')
+
+                    for(let i = 0; i < 2; i++){
+                        d3.select(`#${vis.id}_total_subtitle${i}`)           
+                            .attr('x',vis.margin.left + vis.numberWidth + 10)
+                    }
+                
+                    d3.select(`#${vis.id}_infod_${d.index}`)
+                        .style('visibility', 'visible')
+                    d3.select(`#${vis.id}_infov_${d.index}`)
+                        .style('visibility', 'visible')
+                })
+                .on("mouseout", function(e,d){
+                    d3.select(`#${vis.id}_infod_24`)
+                        .style('visibility', 'visible')
+                    
+                    d3.select(`#${vis.id}_bar_24`)
+                        .attr('fill', 'steelblue')
+
+                    d3.select(`#${vis.id}_total`).text('80')
+                    d3.select(`#${vis.id}_month`).text('February 2022')
+                    d3.select(this).attr("fill", "white")
+
+                    vis.numberWidth = BrowserText.getWidth('80',35,'Helvetica Neue')
+
+                    for(let i = 0; i < 2; i++){
+                        d3.select(`#${vis.id}_total_subtitle${i}`)    
+                            .attr('x',vis.margin.left + vis.numberWidth + 10)
+                    }
+
+                    d3.select(`#${vis.id}_label_${d.index}`)
+                        .style('visibility', 'hidden')
+
+                    d3.select(`#${vis.id}_infod_${d.index}`)
+                        .style('visibility', 'hidden')
+                    
+                    d3.select(`#${vis.id}_infov_${d.index}`)
+                        .style('visibility', 'hidden')
+
+                    d3.select(`#${vis.id}_label_24`)
+                        .style('visibility', 'visible')
+
+                    d3.select(`#${vis.id}_infod_24`)
+                        .style('visibility', 'visible')
+                
+                    d3.select(`#${vis.id}_infov_24`)
+                        .style('visibility', 'visible')
+                })
+
+        console.log(vis.relevantData)
+        
+        vis.svg.selectAll('dates')
+                .data(vis.relevantData)
+                .enter()
+                    .append('text')
+                        .style('visibility', d => d.index === 24 ? 'visible' : 'hidden')
+                        .attr('id', d => `${vis.id}_infod_${d.index}`)
+                        .attr('transform',`translate(${vis.margin.left+vis.labelsWidth},${vis.height+vis.margin.top+vis.margin.bottom*5/6})`)
+                        .attr('x', (d,i) => {
+                            return vis.x_axis(d.Date)
+                        })
+                        .attr('y', 0)
+                        .text(d => d.Date)
+                        .style('font-weight', 200)
+                        .style('font-size', '7pt')
+        
+        vis.svg.selectAll('values')
+                .data(vis.relevantData)
+                .enter()
+                    .append('text')
+                        .style('visibility', d => d.index === 24 ? 'visible' : 'hidden')
+                        .attr('id', d => `${vis.id}_infov_${d.index}`)
+                        .attr('transform',`translate(${vis.margin.left+vis.labelsWidth},${vis.margin.top})`)
+                        .attr('x', (d,i) => {
+                            return vis.x_axis(d.Date)+6
+                        })
+                        .attr('y', d => vis.y_axis(d[vis.keys]) - 7)
+                        .text(d => d[vis.keys])
+                        .style('font-weight', 300)
+                        .style('font-size', '10pt')
+
+        
     }
 }
