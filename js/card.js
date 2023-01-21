@@ -1,7 +1,9 @@
 
-class YoloCard{
-    constructor(data, id, card_title='No card title provided', card_text='No card subtitle provided', keys=[]){
+class Card{
+    constructor(data, base_data, id, card_title='No card title provided', card_text='No card subtitle provided', keys=[]){
         this.data = data;
+        this.base_data = base_data;
+        this.total = 'Cases Referred to the Prosecutor '
         this.id = id;
         this.title = card_title;
         this.text = card_text;
@@ -36,11 +38,11 @@ class YoloCard{
                 
         card.append('h5')
                 .attr('class','card-title')
-                .text(vis.title)         
+                .text(vis.title)
         
         card.append('p')
                 .attr('class','card-text')
-                .text(vis.text)  
+                .text(vis.text)
         
         vis.totalWidth = 0.95*card.node().getBoundingClientRect().width
         vis.height = 90;
@@ -76,11 +78,11 @@ class YoloCard{
             .attr('id', `${vis.id}_total`)
             .attr('x',vis.margin.left)
             .attr('y',vis.margin.top + 75)
-            .text(vis.title.includes('Diverted') ? '80' : '88')
+            .text(vis.title.includes('Diverted') ? `${Math.round(80/340*100)}%` : `${Math.round(80/340*100)}%`)
                 .style('font-weight',500)
                 .style('font-size','35pt')
         
-        vis.numberWidth = BrowserText.getWidth('80',35,'Helvetica Neue')
+        vis.numberWidth = BrowserText.getWidth(vis.title.includes('Diverted') ? `${Math.round(80/340*100)}%` : `${Math.round(80/340*100)}%`,35,'Helvetica Neue')
         
         vis.svg.append('g')
             .selectAll('text')
@@ -104,7 +106,10 @@ class YoloCard{
             .range([0,vis.visWidth])
         
         vis.y_axis = d3.scaleLinear()
-            .domain([0,d3.max(vis.data.map(d => d[vis.keys]))])
+            .domain([0,d3.max(vis.data.map(d => {
+                console.log(vis.base_data.filter(obj => obj.Date == d.Date)[0][vis.total])
+                return Math.round(d[vis.keys]/vis.base_data.filter(obj => obj.Date == d.Date)[0][vis.total]*100)
+            }))])
             .range([vis.height,0])
 
         vis.gridlines = vis.svg.append('g')
@@ -150,7 +155,7 @@ class YoloCard{
                         return vis.x_axis(new Date(yr,mo))
                     })
                     .y(d => {
-                        return vis.y_axis(+d[vis.keys])
+                        return vis.y_axis(Math.round(d[vis.keys]/vis.base_data.filter(obj => obj.Date == d.Date)[0][vis.total]*100))
                     })
                 )
             
@@ -167,7 +172,7 @@ class YoloCard{
                         return vis.x_axis(new Date(yr,mo))
                     })
                     .attr('cy', d => {
-                        return vis.y_axis(+d[vis.keys])
+                        return vis.y_axis(Math.round(d[vis.keys]/vis.base_data.filter(obj => obj.Date == d.Date)[0][vis.total]*100))
                     })
                     .attr('r', 4)
                     .attr('fill','white')
@@ -192,7 +197,7 @@ class YoloCard{
             d3.select(`#${vis.id}_infod_${d.index}`).style('visibility', 'visible')
             d3.select(`#${vis.id}_infoc_${d.index}`).style('visibility', 'visible')
 
-            let innerText = d[vis.keys]
+            let innerText = `${Math.round(d[vis.keys]/vis.base_data.filter(obj => obj.Date == d.Date)[0][vis.total]*100)}%`
             let selectedMonth = `${vis.fullMonths[d.Date.split(' ')[0]]} ${d.Date.split(' ')[1].replace("'", '20')}`
 
             d3.select(`#${vis.id}_total`).text(innerText)
@@ -218,10 +223,10 @@ class YoloCard{
             d3.select(`#${vis.id}_infod_24`).style('visibility', 'visible')
             d3.select(`#${vis.id}_infoc_24`).style('visibility', 'visible')
 
-            d3.select(`#${vis.id}_total`).text('80')
+            d3.select(`#${vis.id}_total`).text('24%')
             d3.select(`#${vis.id}_month`).text('February 2022')
 
-            vis.numberWidth = BrowserText.getWidth('80',35,'Helvetica Neue')
+            vis.numberWidth = BrowserText.getWidth('24%',35,'Helvetica Neue')
 
             for(let i = 0; i < 2; i++){
                 d3.select(`#${vis.id}_total_subtitle${i}`)    
@@ -250,10 +255,10 @@ class YoloCard{
                     let [mo,yr] = d.Date.split(' ')
                     mo = 'JanFebMarAprMayJunJulAugSepOctNovDec'.indexOf(mo) / 3;
                     yr = +yr.replace("'",'20')
-                    return vis.x_axis(new Date(yr,mo))-10
+                    return vis.x_axis(new Date(yr,mo))-13
                 })
                 .attr('y', 0)
-                .text(d => d[vis.keys])
+                .text(d => `${Math.round(d[vis.keys]/vis.base_data.filter(obj => obj.Date == d.Date)[0][vis.total]*100)}%`)
                 .style('font-weight', 200)
                 .style('font-size', '10pt')
         
@@ -283,7 +288,7 @@ class YoloCard{
                     return vis.x_axis(new Date(yr,mo))
                 })
                 .attr('cy', d => {
-                    return vis.y_axis(+(d[vis.keys]))
+                    return vis.y_axis(Math.round(d[vis.keys]/vis.base_data.filter(obj => obj.Date == d.Date)[0][vis.total]*100))
                 })
                 .attr('r', d => d.index === 24 ? 8 : 6)
                 .attr('fill','lightblue')
@@ -300,7 +305,7 @@ class YoloCard{
             .range([0,vis.visWidth])
 
         vis.y_axis = d3.scaleLinear()
-            .domain([0,d3.max(vis.data.map(d => d[vis.keys]))])
+            .domain([0,d3.max(vis.data.map(d => Math.round(d[vis.keys]/vis.base_data.filter(obj => obj.Date == d.Date)[0][vis.total]*100)))])
             .range([vis.height,0])
         
         vis.gridlines = vis.svg.append('g')
@@ -338,11 +343,11 @@ class YoloCard{
                 .attr('transform',`translate(${vis.margin.left+vis.labelsWidth},${vis.margin.top})`)
                 .attr("x", d => vis.x_axis(d.Date))
                 .attr("y", d => {
-                    return vis.y_axis(d[vis.keys])
+                    return vis.y_axis(Math.round(d[vis.keys]/vis.base_data.filter(obj => obj.Date == d.Date)[0][vis.total]*100))
                 })
                 .attr("width", vis.x_axis.bandwidth()*0.8)
                 .attr("height", d => {
-                    return vis.height - vis.y_axis(d[vis.keys]) 
+                    return vis.height - vis.y_axis(Math.round(d[vis.keys]/vis.base_data.filter(obj => obj.Date == d.Date)[0][vis.total]*100)) 
                 })
                 .attr("fill", d => d.index === 24 ? 'steelblue' : "white")
                 .attr('stroke', 'steelblue')
@@ -357,7 +362,7 @@ class YoloCard{
                     d3.select(`#${vis.id}_bar_24`)
                         .attr('fill', 'white')
 
-                    let innerText = d[vis.keys]
+                    let innerText = `${Math.round(d[vis.keys]/vis.base_data.filter(obj => obj.Date == d.Date)[0][vis.total]*100)}%`
                     let selectedMonth = `${vis.fullMonths[d.Date.split(' ')[0]]} ${d.Date.split(' ')[1].replace("'", '20')}`
 
                     d3.select(`#${vis.id}_total`).text(innerText)
@@ -377,17 +382,19 @@ class YoloCard{
                         .style('visibility', 'visible')
                 })
                 .on("mouseout", function(e,d){
-                    d3.select(`#${vis.id}_infod_24`)
-                        .style('visibility', 'visible')
                     
-                    d3.select(`#${vis.id}_bar_24`)
-                        .attr('fill', 'steelblue')
+                    
+                    console.log(`#${vis.id}_bar_24`)
+                    
 
-                    d3.select(`#${vis.id}_total`).text('80')
+                    d3.select(`#${vis.id}_total`).text(`24%`)
                     d3.select(`#${vis.id}_month`).text('February 2022')
                     d3.select(this).attr("fill", "white")
+                    
+                    
+                    
 
-                    vis.numberWidth = BrowserText.getWidth('80',35,'Helvetica Neue')
+                    vis.numberWidth = BrowserText.getWidth('24%',35,'Helvetica Neue')
 
                     for(let i = 0; i < 2; i++){
                         d3.select(`#${vis.id}_total_subtitle${i}`)    
@@ -411,6 +418,12 @@ class YoloCard{
                 
                     d3.select(`#${vis.id}_infov_24`)
                         .style('visibility', 'visible')
+                    
+                    d3.select(`#${vis.id}_infod_24`)
+                        .style('visibility', 'visible')
+
+                    d3.select(`#${vis.id}_bar_24`)
+                        .attr('fill', 'steelblue')
                 })
 
         console.log(vis.relevantData)
@@ -423,12 +436,12 @@ class YoloCard{
                         .attr('id', d => `${vis.id}_infod_${d.index}`)
                         .attr('transform',`translate(${vis.margin.left+vis.labelsWidth},${vis.height+vis.margin.top+vis.margin.bottom*5/6})`)
                         .attr('x', (d,i) => {
-                            return vis.x_axis(d.Date)
+                            return vis.x_axis(d.Date) - 9
                         })
                         .attr('y', 0)
                         .text(d => d.Date)
                         .style('font-weight', 200)
-                        .style('font-size', '7pt')
+                        .style('font-size', '10pt')
         
         vis.svg.selectAll('values')
                 .data(vis.relevantData)
@@ -440,8 +453,8 @@ class YoloCard{
                         .attr('x', (d,i) => {
                             return vis.x_axis(d.Date)+6
                         })
-                        .attr('y', d => vis.y_axis(d[vis.keys]) - 7)
-                        .text(d => d[vis.keys])
+                        .attr('y', d => vis.y_axis(Math.round(d[vis.keys]/vis.base_data.filter(obj => obj.Date == d.Date)[0][vis.total]*100)) - 7)
+                        .text(d => `${Math.round(d[vis.keys]/vis.base_data.filter(obj => obj.Date == d.Date)[0][vis.total]*100)}%`)
                         .style('font-weight', 300)
                         .style('font-size', '10pt')
 
