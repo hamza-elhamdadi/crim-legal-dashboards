@@ -40,9 +40,12 @@ class Card{
                 .attr('class','card-title')
                 .text(vis.title)
         
-        card.append('p')
+        card.selectAll('card-texts')
+            .data(vis.text)
+            .enter()
+            .append('p')
                 .attr('class','card-text')
-                .text(vis.text)
+                .text(d => d)
         
         vis.totalWidth = 0.95*card.node().getBoundingClientRect().width
         vis.height = 90;
