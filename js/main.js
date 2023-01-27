@@ -1,5 +1,5 @@
 
-const data = ['Cases Referred to the Prosecutor','Cases that are Diverted', 'Cases that End with a Sentence']
+const data = ['Cases Referred to the Prosecutor','Cases that Are Diverted', 'Cases that End with a Sentence']
 const texts = {
     none: [
         '',
@@ -73,4 +73,4 @@ function generateVisualization(num_vis, length){
         })
 }
 
-//generateVisualization(2,'long')
+generateVisualization(2,'long')
