@@ -26,9 +26,12 @@ class Card{
         this.margin = {top: 30, right: 20, bottom: 20, left: 0}
     }
 
-    buildCard(){
+    buildCard(selector){
         let vis = this;
-        let page = d3.select('#yolo')            
+        let page = selector 
+                ? d3.select(`#${selector.questionId}`).select('.QuestionText')
+                    .insert('div',':first-child')
+                : d3.select('#yolo')            
 
         let card = page.append('div')
                         .attr('id', vis.id)

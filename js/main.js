@@ -52,7 +52,7 @@ const keys = [
 
 const keys_simple = ['Cases Diverted ', 'Cases Sentenced ']
 
-function generateVisualization(num_vis, length){
+function generateVisualization(num_vis, length, selector){
     Promise.all(data.map(file => d3.csv(`https://hamza-elhamdadi.github.io/crim-legal-dashboards/data/${file}.csv`, (row,i) => {
         Object.keys(row).forEach(key => {
             row[key] = key.includes('Warning') || key.includes('Date') ? row[key] : +row[key];
@@ -64,7 +64,7 @@ function generateVisualization(num_vis, length){
             let ycards = [];
             for(let i = 0; i < data.length-1; i++){
                 let ycard = new Card(data_list[i+1], data_list[0], ids[i],  data[i+1], texts[length][i], keys_simple[i])
-                ycard.buildCard()
+                ycard.buildCard(selector)
                 ycard.drawVisMetadata()
                 if(i == 0 || num_vis==1) ycard.drawLineChart()
                 else ycard.drawBarChart()
