@@ -47,7 +47,7 @@ class Card{
             .data(vis.text)
             .enter()
             .append('p')
-                .attr('class','card-text')
+                .attr('class','card-text info')
                 .text(d => d)
         
         vis.totalWidth = 0.95*card.node().getBoundingClientRect().width
