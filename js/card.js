@@ -36,7 +36,7 @@ class Card{
         let card = page.append('div')
                         .attr('id', vis.id)
                         .attr('class', 'card mx-auto shadow p-3 mb-5 bg-white rounded')
-                        .style('width', '70%')
+                        .style('width', '80%')
                         .style('margin', '10pt')
                 
         card.append('h5')
