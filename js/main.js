@@ -53,7 +53,7 @@ const keys = [
 const keys_simple = ['Cases Diverted ', 'Cases Sentenced ']
 
 function generateVisualization(num_vis, length){
-    Promise.all(data.map(file => d3.csv(`data/${file}.csv`, (row,i) => {
+    Promise.all(data.map(file => d3.csv(`https://hamza-elhamdadi/crim-legal-dashboards/data/${file}.csv`, (row,i) => {
         Object.keys(row).forEach(key => {
             row[key] = key.includes('Warning') || key.includes('Date') ? row[key] : +row[key];
         })
@@ -73,4 +73,4 @@ function generateVisualization(num_vis, length){
         })
 }
 
-generateVisualization(2,'long')
+//generateVisualization(2,'long')
