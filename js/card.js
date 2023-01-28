@@ -1,13 +1,13 @@
 
 class Card{
-    constructor(data, base_data, id, card_title='No card title provided', card_text='No card subtitle provided', keys=[]){
+    constructor(data, base_data, metadata, text_length){
         this.data = data;
         this.base_data = base_data;
         this.total = 'Cases Referred to the Prosecutor '
-        this.id = id;
-        this.title = card_title;
-        this.text = card_text;
-        this.keys = keys;
+        this.id = metadata.id;
+        this.title = metadata.title;
+        this.text = metadata.text[text_length];
+        this.keys = metadata.key;
         this.fullMonths = {
             'Jan': 'January', 
             'Feb': 'February', 
@@ -30,7 +30,7 @@ class Card{
         let vis = this;
         let page = selector 
                 ? d3.select(`#${selector.questionId}`).select('.QuestionText')
-                    .insert('div',':first-child')
+                    .append('div')
                 : d3.select('#yolo')            
 
         let card = page.append('div')
