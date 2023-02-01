@@ -6,6 +6,7 @@ class Card{
         this.total = 'Cases Referred to the Prosecutor '
         this.id = metadata.id;
         this.title = metadata.title;
+        this.text_length = text_length;
         this.text = metadata.text[text_length];
         this.keys = metadata.key;
         this.fullMonths = {
@@ -26,7 +27,7 @@ class Card{
         this.margin = {top: 30, right: 20, bottom: 20, left: 0}
     }
 
-    buildCard(selector){
+    buildCard(num_vis, selector){
         let vis = this;
         let page = selector 
                 ? d3.select(`#${selector.questionId}`).select('.QuestionText')
@@ -44,7 +45,7 @@ class Card{
                 .text(vis.title)
         
         card.selectAll('card-texts')
-            .data(vis.text)
+            .data(vis.text[[(vis.text_length === 'long' && vis.id === 'sentence' && num_vis === 2) ? 'bar' : 'line']])
             .enter()
             .append('p')
                 .attr('class', selector ? 'card-text info' : 'card-text')
