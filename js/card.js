@@ -45,7 +45,7 @@ class Card{
                 .text(vis.title)
         
         card.selectAll('card-texts')
-            .data(vis.text[[(vis.text_length === 'long' && vis.id === 'sentence' && num_vis === 2) ? 'bar' : 'line']])
+            .data(vis.text_length === 'long' ? vis.text[[(vis.id === 'sentence' && num_vis === 2) ? 'bar' : 'line']] : vis.text)
             .enter()
             .append('p')
                 .attr('class', selector ? 'card-text info' : 'card-text')
