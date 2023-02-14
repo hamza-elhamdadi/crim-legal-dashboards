@@ -27,11 +27,11 @@ class Card{
         this.margin = {top: 30, right: 20, bottom: 20, left: 0}
     }
 
-    buildCard(num_vis, selector){
+    buildCard(num_vis, chart_type, selector){
         let vis = this;
         let page = selector 
                 ? d3.select(`#${selector.questionId}`).select('.QuestionText')
-                    .append('div')
+                    .append('div').attr('id', 'yolo')
                 : d3.select('#yolo')            
 
         let card = page.append('div')
@@ -45,7 +45,7 @@ class Card{
                 .text(vis.title)
         
         card.selectAll('card-texts')
-            .data(vis.text_length === 'long' ? vis.text[[(vis.id === 'sentence' && num_vis === 2) ? 'bar' : 'line']] : vis.text)
+            .data(vis.text)
             .enter()
             .append('p')
                 .attr('class', selector ? 'card-text info' : 'card-text')
@@ -54,8 +54,10 @@ class Card{
         vis.totalWidth = 0.95*card.node().getBoundingClientRect().width
         vis.height = 90;
 
-        vis.visWidth = (vis.totalWidth*0.6 - (vis.margin.left + vis.margin.right));
-        vis.labelsWidth = (vis.totalWidth*0.4 - (vis.margin.left + vis.margin.right));
+        vis.factor = 0.65 // (6+(chart_type === 'bar')*3/5)/10
+
+        vis.visWidth = (vis.totalWidth*vis.factor - (vis.margin.left + vis.margin.right));
+        vis.labelsWidth = (vis.totalWidth*(1-vis.factor) - (vis.margin.left + vis.margin.right));
 
         vis.svg = card.append('g')
                     .style('text-align','center')
@@ -69,7 +71,7 @@ class Card{
         vis.svg.append('text')
             .attr('x',vis.margin.left)
             .attr('y',vis.margin.top)
-            .text('Total Cases')
+            .text('Percentage of Cases')
                 .style('font-weight',500)
                 .style('font-size','12pt')
         
@@ -108,8 +110,9 @@ class Card{
         let vis = this;
         vis.relevantData = vis.data.filter(d => +d.Date.replace("'",'').split(' ')[1] > 20)
 
+        //d3.extent(vis.relevantData, d => d3.timeParse("%b '%y")(d.Date))
         vis.x_axis = d3.scaleTime()
-            .domain([new Date(2021, 1), new Date(2022, 1)])
+            .domain([new Date(2021, 0), new Date(2022, 1)])
             .range([0,vis.visWidth])
         
         vis.y_axis = d3.scaleLinear()
@@ -121,7 +124,7 @@ class Card{
 
         vis.gridlines = vis.svg.append('g')
             .selectAll('line')
-            .data([0, 100])
+            .data([0, 20, 40])
             .enter()
             
         vis.gridlines.append('line')
@@ -141,7 +144,7 @@ class Card{
                 .attr('y', d => {
                     return vis.y_axis(d)
                 })
-                .text(d => d)
+                .text(d => d+'%')
                 .attr('text-anchor', 'middle')
                 .attr('font-weight', 300)
                 .attr('font-size', '11pt')
@@ -158,7 +161,7 @@ class Card{
                         let [mo,yr] = d.Date.split(' ')
                         mo = 'JanFebMarAprMayJunJulAugSepOctNovDec'.indexOf(mo) / 3;
                         yr = +yr.replace("'",'20')
-                        //console.log(vis.x_axis(new Date(yr,mo)))
+                        console.log(new Date(yr,mo))
                         return vis.x_axis(new Date(yr,mo))
                     })
                     .y(d => {
@@ -245,10 +248,10 @@ class Card{
             .attr('id', d => `${vis.id}_infor_${d.index}`)
             .style('visibility', d => d.index === 24 ? 'visible' : 'hidden')
             .attr('transform',`translate(${vis.margin.left+vis.labelsWidth},0)`)
-            .attr('x', (d,i) => (i-1.5)*vis.visWidth/12)
+            .attr('x', (d,i) => (i-0.5)*vis.visWidth/13)
             .attr('y', 0)
-            .attr('width', vis.visWidth/12)
-            .attr('height', vis.height + vis.margin.top + vis.margin.bottom*0.3)
+            .attr('width', vis.visWidth/13)
+            .attr('height', vis.height + vis.margin.top)
             .attr('fill', 'grey')   
             .attr('stroke', 'none')
             .attr('opacity', 0.2)
@@ -309,7 +312,7 @@ class Card{
 
         vis.x_axis = d3.scaleBand()
             .domain(vis.relevantData.map(d => d.Date))
-            .range([0,vis.visWidth])
+            .range([-0.035*vis.visWidth,1.035*vis.visWidth])
 
         vis.y_axis = d3.scaleLinear()
             .domain([0,d3.max(vis.data.map(d => Math.round(d[vis.keys]/vis.base_data.filter(obj => obj.Date == d.Date)[0][vis.total]*100)))])
@@ -317,7 +320,7 @@ class Card{
         
         vis.gridlines = vis.svg.append('g')
             .selectAll('line')
-            .data([0, 100])
+            .data([0, 20])
             .enter()
             
         vis.gridlines.append('line')
@@ -337,7 +340,7 @@ class Card{
                 .attr('y', d => {
                     return vis.y_axis(d)
                 })
-                .text(d => d)
+                .text(d => d+'%')
                 .attr('text-anchor', 'middle')
                 .attr('font-weight', 300)
                 .attr('font-size', '11pt')  
@@ -352,7 +355,7 @@ class Card{
                 .attr("y", d => {
                     return vis.y_axis(Math.round(d[vis.keys]/vis.base_data.filter(obj => obj.Date == d.Date)[0][vis.total]*100))
                 })
-                .attr("width", vis.x_axis.bandwidth()*0.8)
+                .attr("width", vis.x_axis.bandwidth())
                 .attr("height", d => {
                     return vis.height - vis.y_axis(Math.round(d[vis.keys]/vis.base_data.filter(obj => obj.Date == d.Date)[0][vis.total]*100)) 
                 })
@@ -443,7 +446,7 @@ class Card{
                         .attr('id', d => `${vis.id}_infod_${d.index}`)
                         .attr('transform',`translate(${vis.margin.left+vis.labelsWidth},${vis.height+vis.margin.top+vis.margin.bottom*5/6})`)
                         .attr('x', (d,i) => {
-                            return vis.x_axis(d.Date) - 9
+                            return vis.x_axis(d.Date)
                         })
                         .attr('y', 0)
                         .text(d => d.Date)
@@ -458,7 +461,7 @@ class Card{
                         .attr('id', d => `${vis.id}_infov_${d.index}`)
                         .attr('transform',`translate(${vis.margin.left+vis.labelsWidth},${vis.margin.top})`)
                         .attr('x', (d,i) => {
-                            return vis.x_axis(d.Date)+6
+                            return vis.x_axis(d.Date)+8
                         })
                         .attr('y', d => vis.y_axis(Math.round(d[vis.keys]/vis.base_data.filter(obj => obj.Date == d.Date)[0][vis.total]*100)) - 7)
                         .text(d => `${Math.round(d[vis.keys]/vis.base_data.filter(obj => obj.Date == d.Date)[0][vis.total]*100)}%`)

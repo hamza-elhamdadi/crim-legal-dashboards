@@ -10,16 +10,13 @@ const metadata = [
         text: {
             none: [''],
             short: ['This section presents information on the percentage of cases that are enrolled in a pretrial diversion program instead of being prosecuted. Pretrial diversion programs offer eligible defendants a chance to avoid charges, incarceration, or a criminal record, provided the programs are completed. They often address needs such as mental health, addiction, and homelessness. Data from February 2021 through January 2022.'],
-            long: {
-                line: [
+            long: [
                     'This section presents information on the percentage of cases that are enrolled in a pretrial diversion program instead of being prosecuted. The percentage of cases that are diverted is calculated by dividing the number of diverted cases by the total number of cases the office handles in a given month. Monthly data from February 2021 through January 2022 shown.', 
-                    'Pretrial diversion programs offer eligible defendants a chance to avoid charges, incarceration, or a criminal record, provided the programs are completed. They often address needs such as mental health, addiction, and homelessness. The desired outcome is a consistency — or increase — in the percentage of cases that are diverted over time.',
-                    'In the figure, the height of the position of the points indicate proportion of cases sentenced. Higher points indicate a larger proportion, while lower points indicate a smaller proportion. Lines between points indicate the month-to-month trajectory. This shows that the percentage of diverted cases remained relatively constant from April 2021 until January 2022.',
-                    'Data is updated yearly. The next update is scheduled to be March 2024.'
-                ]
-            }
+                    'Pretrial diversion programs offer eligible defendants a chance to avoid charges, incarceration, or a criminal record, provided the programs are completed. They often address needs such as mental health, addiction, and homelessness.',
+                    'The goal of diversion programs is often to provide rehabilitation or support to individuals who have committed minor or non-violent offenses and to reduce the burden on the criminal justice system. The desired outcome is a consistency — or increase — in the percentage of cases that are diverted over time.',
+                    'Data is updated yearly. The next update is scheduled to be March 2023.'
+            ]
         },
-        
     },
     {
         id: 'sentence',
@@ -28,20 +25,12 @@ const metadata = [
         text: {
             none: [''],
             short: ['This section presents information on the percentage of cases that are sentenced following prosecution. After conviction, and depending on the seriousness of the offense, an individual will be sentenced to death, prison, jail, probation, assigned monetary penalties, such as restitution and fines, or other penalties, such as community service. Data from February 2021 through February 2022.'],
-            long: {
-                bar: [
-                    'This section presents information on the percentage of cases that are sentenced following prosecution. The percentage of cases that are sentenced is calculated by dividing the number of diverted cases by the total number of cases the office handles in a given month. Monthly data from February 2021 through January 2022 shown.',
-                    'After conviction, and depending on the seriousness of the offense, an individual will be sentenced to death, prison, jail, probation, assigned monetary penalties, such as restitution and fines, or other penalties, such as community service. The desired outcome is a consistency — or decrease — in the percentage of cases that are sentenced.', 
-                    'In the figure, the height of the bars indicate the proportion of cases sentenced. Taller bars indicate a larger proportion, while shorter bars indicate a smaller proportion. This shows that while the proportion of cases remained relatively constant from April 2021 until January 2022. However, in February 2022 the sentencing rate rose.',
-                    'Data is updated yearly. The next update is scheduled to be March 2024.'
-                ],
-                line: [
-                    'This section presents information on the percentage of cases that are sentenced following prosecution. The percentage of cases that are sentenced is calculated by dividing the number of diverted cases by the total number of cases the office handles in a given month. Monthly data from February 2021 through February 2022 shown.',
-                    'After conviction, and depending on the seriousness of the offense, an individual will be sentenced to death, prison, jail, probation, assigned monetary penalties, such as restitution and fines, or other penalties, such as community service. The desired outcome is a consistency — or decrease — in the percentage of cases that are sentenced.',                    
-                    'In the figure, the height of the position of the points indicate proportion of cases sentenced. Higher points indicate a larger proportion, while lower points indicate a smaller proportion. Lines between points indicate the month-to-month trajectory. This shows that the proportion of cases remained relatively constant from April 2021 until January 2022. However, in February 2022 the sentencing rate rose.',
-                    'Data is updated yearly. The next update is scheduled to be March 2024.'
+            long: [
+                    'This section presents information on the percentage of cases that are sentenced following prosecution. The percentage of cases that are sentenced is calculated by dividing the number of diverted cases by the total number of cases the office handles in a given month. Monthly data from February 2021 through February 2022 shown. ',
+                    'After conviction, and depending on the seriousness of the offense, an individual will be sentenced to death, prison, jail, probation, assigned monetary penalties, such as restitution and fines, or other penalties, such as community service. The specific sentence imposed will depend on the nature of the crime, the circumstances of the case, and the applicable laws in the jurisdiction where the case was tried.',
+                    'The desired outcome is a consistency — or decrease — in the percentage of cases that are sentenced. ',
+                    'Data is updated yearly. The next update is scheduled to be March 2023.'
                 ]
-            }
         }
     }
 ]
@@ -84,13 +73,19 @@ function generateVisualization(num_vis, length, selector){
             let ycards = [];
             for(let i = 0; i < metadata.length-1; i++){
                 let ycard = new Card(data_list[i+1], data_list[0], metadata[i+1], length)
-                ycard.buildCard(num_vis, selector)
+                
+                
+                if(i == 0 || num_vis==1) {
+                    ycard.buildCard(num_vis, 'line', selector)
+                    ycard.drawLineChart()
+                } else {
+                    ycard.buildCard(num_vis, 'bar', selector)
+                    ycard.drawBarChart()
+                }
                 ycard.drawVisMetadata()
-                if(i == 0 || num_vis==1) ycard.drawLineChart()
-                else ycard.drawBarChart()
                 ycards.push(ycard)
             }
         })
 }
 
-//generateVisualization(1,'long')
+generateVisualization(2,'long')
