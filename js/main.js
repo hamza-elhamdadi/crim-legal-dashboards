@@ -11,10 +11,9 @@ const metadata = [
             none: [''],
             short: ['This section presents information on the percentage of cases that are enrolled in a pretrial diversion program instead of being prosecuted. Pretrial diversion programs offer eligible defendants a chance to avoid charges, incarceration, or a criminal record, provided the programs are completed. They often address needs such as mental health, addiction, and homelessness. Data from February 2021 through January 2022.'],
             long: [
-                    'This section presents information on the percentage of cases that are enrolled in a pretrial diversion program instead of being prosecuted. The percentage of cases that are diverted is calculated by dividing the number of diverted cases by the total number of cases the office handles in a given month. Monthly data from February 2021 through January 2022 shown.', 
-                    'Pretrial diversion programs offer eligible defendants a chance to avoid charges, incarceration, or a criminal record, provided the programs are completed. They often address needs such as mental health, addiction, and homelessness.',
-                    'The goal of diversion programs is often to provide rehabilitation or support to individuals who have committed minor or non-violent offenses and to reduce the burden on the criminal justice system. The desired outcome is a consistency — or increase — in the percentage of cases that are diverted over time.',
-                    'Data is updated yearly. The next update is scheduled to be March 2023.'
+                    'This section presents information on the percentage of cases that are enrolled in a pretrial diversion program instead of being prosecuted. Pretrial diversion programs offer eligible defendants a chance to avoid charges, incarceration, or a criminal record, provided the programs are completed. They often address needs such as mental health, addiction, and homelessness.', 
+                    'To participate in diversion, an accused is typically evaluated by a clinician who can recommend treatment to address the underlying cause of criminality. This may happen prior to arraignment, with the option to avoid any criminal record, or after arraignment, with the option to avoid trial and, if found guilty, conviction. The accused accesses services from a community provider, with court oversight. If the accused is compliant in the treatment program, prosecutors may choose to drop charges or impose a different non-conviction option.',
+                    'The percentage of cases that are diverted is calculated by dividing the number of diverted cases by the total number of cases the office handles in a given month. Monthly data from February 2021 through January 2022 shown.'
             ]
         },
     },
@@ -26,10 +25,9 @@ const metadata = [
             none: [''],
             short: ['This section presents information on the percentage of cases that are sentenced following prosecution. After conviction, and depending on the seriousness of the offense, an individual will be sentenced to death, prison, jail, probation, assigned monetary penalties, such as restitution and fines, or other penalties, such as community service. Data from February 2021 through February 2022.'],
             long: [
-                    'This section presents information on the percentage of cases that are sentenced following prosecution. The percentage of cases that are sentenced is calculated by dividing the number of diverted cases by the total number of cases the office handles in a given month. Monthly data from February 2021 through February 2022 shown. ',
-                    'After conviction, and depending on the seriousness of the offense, an individual will be sentenced to death, prison, jail, probation, assigned monetary penalties, such as restitution and fines, or other penalties, such as community service. The specific sentence imposed will depend on the nature of the crime, the circumstances of the case, and the applicable laws in the jurisdiction where the case was tried.',
-                    'The desired outcome is a consistency — or decrease — in the percentage of cases that are sentenced. ',
-                    'Data is updated yearly. The next update is scheduled to be March 2023.'
+                    'This section presents information on the percentage of cases that are sentenced following prosecution.The specific sentence imposed will depend on the nature of the crime, the circumstances of the case, and the applicable laws in the jurisdiction where the case was tried.',
+                    'Sentencing typically takes place after conviction. Depending on the seriousness of the offense, an individual will be sentenced to death, prison, jail, probation, assigned monetary penalties, such as restitution and fines, or other penalties, such as community service. After completing their sentence, or if they are released early, the defendant may be placed on court-supervised probation.',
+                    'The percentage of cases that are sentenced is calculated by dividing the number of diverted cases by the total number of cases the office handles in a given month. Monthly data from February 2021 through February 2022 shown.'
                 ]
         }
     }
@@ -74,7 +72,6 @@ function generateVisualization(num_vis, length, selector){
             for(let i = 0; i < metadata.length-1; i++){
                 let ycard = new Card(data_list[i+1], data_list[0], metadata[i+1], length)
                 
-                
                 if(i == 0 || num_vis==1) {
                     ycard.buildCard(num_vis, 'line', selector)
                     ycard.drawLineChart()
@@ -88,4 +85,4 @@ function generateVisualization(num_vis, length, selector){
         })
 }
 
-generateVisualization(2,'long')
+generateVisualization(1,'long')
