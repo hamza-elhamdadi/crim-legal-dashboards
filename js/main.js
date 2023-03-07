@@ -59,7 +59,7 @@ const keys = [
 ]
 
 
-function generateVisualization(num_vis, length, selector){
+function generateVisualization(num_vis, length, selector, questionText){
     Promise.all(metadata.map(file => d3.csv(`https://hamza-elhamdadi.github.io/crim-legal-dashboards/data/${file.title}.csv`, (row,i) => {
         Object.keys(row).forEach(key => {
             row[key] = key.includes('Warning') || key.includes('Date') ? row[key] : +row[key];
@@ -82,7 +82,8 @@ function generateVisualization(num_vis, length, selector){
                 ycard.drawVisMetadata()
                 ycards.push(ycard)
             }
+            if(questionText) addQuestion(selector, questionText)
         })
 }
 
-generateVisualization(1,'long')
+// generateVisualization(2,'test','long')

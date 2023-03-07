@@ -1,4 +1,13 @@
 
+function addQuestion(selector, questionText){
+    let div = selector 
+            ? d3.select(`#${selector.questionId}`).select('.QuestionText')
+                .append('div').attr('id', 'question')
+            : d3.select('#yolo').append('div').attr('id', 'question')
+            
+    div.text(questionText)
+}
+
 class Card{
     constructor(data, base_data, metadata, text_length){
         this.data = data;
