@@ -86,4 +86,4 @@ function generateVisualization(num_vis, length, selector, questionText){
         })
 }
 
-// generateVisualization(2,'test','long')
+// generateVisualization(2,'long',null,'<b>test</b>')

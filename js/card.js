@@ -5,7 +5,7 @@ function addQuestion(selector, questionText){
                 .append('div').attr('id', 'question')
             : d3.select('#yolo').append('div').attr('id', 'question')
             
-    div.text(questionText)
+    div.html(questionText)
 }
 
 class Card{
